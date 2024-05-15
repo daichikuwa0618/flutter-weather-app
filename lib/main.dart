@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_training/use_case/get_weather.dart';
 import 'package:flutter_training/weather_screen.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class App extends StatelessWidget {
           seedColor: Colors.blue,
         ),
       ),
-      home: const WeatherScreen(),
+      home: const WeatherScreen(GetWeather()),
     );
   }
 }
