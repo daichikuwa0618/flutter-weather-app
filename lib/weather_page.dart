@@ -78,31 +78,23 @@ class _ButtonsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Row(
       children: [
         Expanded(
           child: TextButton(
             onPressed: () {},
-            child: Text(
+            child: const Text(
               'Close',
               textAlign: TextAlign.center,
-              style: textTheme.labelLarge?.copyWith(
-                color: Colors.blue,
-              ),
             ),
           ),
         ),
         Expanded(
           child: TextButton(
             onPressed: () {},
-            child: Text(
+            child: const Text(
               'Reload',
               textAlign: TextAlign.center,
-              style: textTheme.labelLarge?.copyWith(
-                color: Colors.blue,
-              ),
             ),
           ),
         ),
