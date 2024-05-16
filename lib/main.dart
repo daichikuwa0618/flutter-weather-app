@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_training/weather_page.dart';
+import 'package:flutter_training/weather_screen.dart';
 
 void main() {
   runApp(const App());
@@ -18,7 +18,7 @@ class App extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const WeatherPage(),
+      home: const WeatherScreen(),
     );
   }
 }
