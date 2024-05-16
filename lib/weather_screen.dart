@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/use_case/get_weather.dart';
+import 'package:flutter_training/weather_icon.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen(GetWeather getWeather, {super.key})
@@ -27,7 +28,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
               //       [flex: 1] を設定してある [Spacer] および [Expanded] で挟んでいる。
               //       [Column] に要素を追加すると上下中央のレイアウトが崩れるため注意。
               const Spacer(),
-              const _ForecastContent(),
+              _ForecastContent(
+                weatherCondition: _weatherCondition,
+              ),
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
@@ -53,7 +56,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
 }
 
 class _ForecastContent extends StatelessWidget {
-  const _ForecastContent();
+  const _ForecastContent({WeatherCondition? weatherCondition})
+    : _weatherCondition = weatherCondition;
+
+  final WeatherCondition? _weatherCondition;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +67,9 @@ class _ForecastContent extends StatelessWidget {
 
     return Column(
       children: [
-        const AspectRatio(aspectRatio: 1, child: Placeholder(),),
+        WeatherIcon(
+          weatherCondition: _weatherCondition,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
