@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_training/weather/use_case/get_weather.dart';
-import 'package:flutter_training/weather/weather_screen.dart';
+import 'package:flutter_training/router.dart';
 
 void main() {
   runApp(const App());
@@ -11,14 +10,14 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Weather App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
         ),
       ),
-      home: const WeatherScreen(GetWeather()),
+      routerConfig: router,
     );
   }
 }
