@@ -38,7 +38,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       reloadAction: () {
-                        final weatherCondition = widget._getWeather.execute();
+                        final weatherCondition = widget._getWeather();
                         setState(() {
                           _weatherCondition = weatherCondition;
                         });

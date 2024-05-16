@@ -4,7 +4,7 @@ import 'package:yumemi_weather/yumemi_weather.dart';
 final class GetWeather {
   const GetWeather();
 
-  WeatherCondition execute() {
+  WeatherCondition call() {
     final response = YumemiWeather().fetchSimpleWeather();
     return WeatherCondition.values.byName(response);
   }
