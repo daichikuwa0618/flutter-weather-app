@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
-import 'package:flutter_training/use_case/get_weather.dart';
-import 'package:flutter_training/weather_icon.dart';
+import 'package:flutter_training/weather/use_case/get_weather.dart';
+import 'package:flutter_training/weather/weather_icon.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen(GetWeather getWeather, {super.key})
