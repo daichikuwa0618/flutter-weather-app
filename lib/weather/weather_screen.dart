@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
+import 'package:go_router/go_router.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen(GetWeather getWeather, {super.key})
@@ -37,6 +38,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
+                      closeAction: () {
+                        context.pop();
+                      },
                       reloadAction: () {
                         final weatherCondition = widget._getWeather();
                         setState(() {
@@ -101,9 +105,11 @@ class _ForecastContent extends StatelessWidget {
 }
 
 class _ButtonsRow extends StatelessWidget {
-  const _ButtonsRow({required VoidCallback reloadAction})
-    : _reloadAction = reloadAction;
+  const _ButtonsRow({required VoidCallback closeAction, required VoidCallback reloadAction})
+    : _closeAction = closeAction,
+      _reloadAction = reloadAction;
 
+  final VoidCallback _closeAction;
   final VoidCallback _reloadAction;
 
   @override
@@ -112,7 +118,7 @@ class _ButtonsRow extends StatelessWidget {
       children: [
         Expanded(
           child: TextButton(
-            onPressed: () {},
+            onPressed: _closeAction,
             child: const Text(
               'Close',
               textAlign: TextAlign.center,
