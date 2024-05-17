@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen(GetWeather getWeather, {super.key})
-    : _getWeather = getWeather;
+      : _getWeather = getWeather;
 
   final GetWeather _getWeather;
 
@@ -61,7 +61,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
 class _ForecastContent extends StatelessWidget {
   const _ForecastContent({WeatherCondition? weatherCondition})
-    : _weatherCondition = weatherCondition;
+      : _weatherCondition = weatherCondition;
 
   final WeatherCondition? _weatherCondition;
 
@@ -105,9 +105,11 @@ class _ForecastContent extends StatelessWidget {
 }
 
 class _ButtonsRow extends StatelessWidget {
-  const _ButtonsRow({required VoidCallback closeAction, required VoidCallback reloadAction})
-    : _closeAction = closeAction,
-      _reloadAction = reloadAction;
+  const _ButtonsRow({
+    required VoidCallback closeAction,
+    required VoidCallback reloadAction,
+  })  : _closeAction = closeAction,
+        _reloadAction = reloadAction;
 
   final VoidCallback _closeAction;
   final VoidCallback _reloadAction;
