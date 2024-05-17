@@ -35,8 +35,8 @@ class _LaunchScreenState extends State<LaunchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return const Scaffold(
+      body: ColoredBox(
         color: Colors.green,
       ),
     );
