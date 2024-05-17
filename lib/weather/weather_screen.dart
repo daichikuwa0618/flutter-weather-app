@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
-import 'package:go_router/go_router.dart';
 
 class WeatherScreen extends StatefulWidget {
-  const WeatherScreen(GetWeather getWeather, {super.key})
-      : _getWeather = getWeather;
+  const WeatherScreen(
+    GetWeather getWeather, {
+    required VoidCallback close,
+    super.key,
+  })  : _getWeather = getWeather,
+        _close = close;
 
   final GetWeather _getWeather;
+  final VoidCallback _close;
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();
@@ -38,9 +42,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
-                      closeAction: () {
-                        context.pop();
-                      },
+                      closeAction: widget._close,
                       reloadAction: () {
                         final weatherCondition = widget._getWeather();
                         setState(() {
