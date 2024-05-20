@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_training/util/layout_state_mixin.dart';
 
 class LaunchScreen extends StatefulWidget {
   const LaunchScreen({required AsyncCallback showWeather, super.key})
@@ -12,16 +13,10 @@ class LaunchScreen extends StatefulWidget {
   State<LaunchScreen> createState() => _LaunchScreenState();
 }
 
-class _LaunchScreenState extends State<LaunchScreen> {
+class _LaunchScreenState extends State<LaunchScreen> with LayoutStateMixin {
   @override
-  void initState() {
-    super.initState();
-    unawaited(_showWeatherAfterRendering());
-  }
-
-  Future<void> _showWeatherAfterRendering() async {
-    await WidgetsBinding.instance.endOfFrame;
-    await _showWeather();
+  void didLayoutEnded() {
+    unawaited(_showWeather());
   }
 
   Future<void> _showWeather() async {
