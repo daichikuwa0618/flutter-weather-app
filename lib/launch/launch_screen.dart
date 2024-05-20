@@ -39,6 +39,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
     return const Scaffold(
       body: ColoredBox(
         color: Colors.green,
+        child: SizedBox.expand(),
       ),
     );
   }
