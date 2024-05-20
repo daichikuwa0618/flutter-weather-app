@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class _LaunchScreenState extends State<LaunchScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(_showWeatherAfterRendering);
+    unawaited(_showWeatherAfterRendering());
   }
 
   Future<void> _showWeatherAfterRendering() async {
