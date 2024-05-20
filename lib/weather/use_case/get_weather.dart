@@ -4,8 +4,8 @@ import 'package:yumemi_weather/yumemi_weather.dart';
 final class GetWeather {
   const GetWeather();
 
-  WeatherCondition call() {
-    final response = YumemiWeather().fetchSimpleWeather();
+  WeatherCondition call({required String area}) {
+    final response = YumemiWeather().fetchThrowsWeather(area);
     return WeatherCondition.values.byName(response);
   }
 }

@@ -44,7 +44,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     child: _ButtonsRow(
                       closeAction: widget._close,
                       reloadAction: () {
-                        final weatherCondition = widget._getWeather();
+                        final weatherCondition = widget._getWeather(
+                          area: 'tokyo',
+                        );
                         setState(() {
                           _weatherCondition = weatherCondition;
                         });
