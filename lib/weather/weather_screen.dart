@@ -4,10 +4,15 @@ import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
 
 class WeatherScreen extends StatefulWidget {
-  const WeatherScreen(GetWeather getWeather, {super.key})
-    : _getWeather = getWeather;
+  const WeatherScreen(
+    GetWeather getWeather, {
+    required VoidCallback close,
+    super.key,
+  })  : _getWeather = getWeather,
+        _close = close;
 
   final GetWeather _getWeather;
+  final VoidCallback _close;
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();
@@ -37,6 +42,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
+                      closeAction: widget._close,
                       reloadAction: () {
                         final weatherCondition = widget._getWeather();
                         setState(() {
@@ -57,7 +63,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
 class _ForecastContent extends StatelessWidget {
   const _ForecastContent({WeatherCondition? weatherCondition})
-    : _weatherCondition = weatherCondition;
+      : _weatherCondition = weatherCondition;
 
   final WeatherCondition? _weatherCondition;
 
@@ -101,9 +107,13 @@ class _ForecastContent extends StatelessWidget {
 }
 
 class _ButtonsRow extends StatelessWidget {
-  const _ButtonsRow({required VoidCallback reloadAction})
-    : _reloadAction = reloadAction;
+  const _ButtonsRow({
+    required VoidCallback closeAction,
+    required VoidCallback reloadAction,
+  })  : _closeAction = closeAction,
+        _reloadAction = reloadAction;
 
+  final VoidCallback _closeAction;
   final VoidCallback _reloadAction;
 
   @override
@@ -112,7 +122,7 @@ class _ButtonsRow extends StatelessWidget {
       children: [
         Expanded(
           child: TextButton(
-            onPressed: () {},
+            onPressed: _closeAction,
             child: const Text(
               'Close',
               textAlign: TextAlign.center,
