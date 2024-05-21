@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
@@ -20,7 +21,7 @@ class WeatherScreen extends StatefulWidget {
 }
 
 class _WeatherScreenState extends State<WeatherScreen> {
-  WeatherCondition? _weatherCondition;
+  Weather? _weather;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
               //       [Column] に要素を追加すると上下中央のレイアウトが崩れるため注意。
               const Spacer(),
               _ForecastContent(
-                weatherCondition: _weatherCondition,
+                weatherCondition: _weather?.condition,
+                maxTemperature: _weather?.maxTemperature,
+                minTemperature: _weather?.minTemperature,
               ),
               Expanded(
                 child: Align(
@@ -58,9 +61,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   void _reloadWeather() {
     try {
-      final weatherCondition = widget._getWeather(area: 'tokyo');
+      final weather = widget._getWeather(area: 'tokyo');
       setState(() {
-        _weatherCondition = weatherCondition;
+        _weather = weather;
       });
     } on GetWeatherException catch(e) {
       unawaited(_showErrorDialog(e.message));
@@ -86,10 +89,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
 }
 
 class _ForecastContent extends StatelessWidget {
-  const _ForecastContent({WeatherCondition? weatherCondition})
-      : _weatherCondition = weatherCondition;
+  const _ForecastContent({
+    required WeatherCondition? weatherCondition,
+    required int? maxTemperature,
+    required int? minTemperature,
+  })  : _weatherCondition = weatherCondition,
+        _maxTemperature = maxTemperature,
+        _mixTemperature = minTemperature;
 
   final WeatherCondition? _weatherCondition;
+  final int? _maxTemperature;
+  final int? _mixTemperature;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +116,7 @@ class _ForecastContent extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '** ℃',
+                  '${_mixTemperature ?? '**'} ℃',
                   textAlign: TextAlign.center,
                   style: textTheme.labelLarge?.copyWith(
                     color: Colors.blue,
@@ -115,7 +125,7 @@ class _ForecastContent extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '** ℃',
+                  '${_maxTemperature ?? '**'} ℃',
                   textAlign: TextAlign.center,
                   style: textTheme.labelLarge?.copyWith(
                     color: Colors.red,

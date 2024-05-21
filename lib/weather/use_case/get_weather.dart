@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
@@ -29,7 +30,7 @@ final class InvalidParameterException extends GetWeatherException {
 final class GetWeather {
   const GetWeather();
 
-  WeatherCondition call({required String area}) {
+  Weather call({required String area}) {
     try {
       final request = _Request(area, DateTime.now());
       final requestJsonString = jsonEncode(request.toJson());
@@ -37,10 +38,12 @@ final class GetWeather {
       final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
       final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
       final response = _Response.fromJson(responseJson);
-      print(response.maxTemperature);
-      print(response.minTemperature);
-      print(response.date);
-      return response.condition;
+      return Weather(
+        condition: response.condition,
+        maxTemperature: response.maxTemperature,
+        minTemperature: response.minTemperature,
+        date: response.date,
+      );
     } on YumemiWeatherError catch(e) {
       switch (e) {
         case YumemiWeatherError.unknown:
