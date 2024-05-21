@@ -12,6 +12,8 @@ mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
 
   Future<void> _asyncInitState() async {
     await WidgetsBinding.instance.endOfFrame;
-    didLayoutEnded();
+    if (mounted) {
+      didLayoutEnded();
+    }
   }
 }
