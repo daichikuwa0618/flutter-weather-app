@@ -43,14 +43,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       closeAction: widget._close,
-                      reloadAction: () {
-                        final weatherCondition = widget._getWeather(
-                          area: 'tokyo',
-                        );
-                        setState(() {
-                          _weatherCondition = weatherCondition;
-                        });
-                      },
+                      reloadAction: _reloadWeather,
                     ),
                   ),
                 ),
@@ -60,6 +53,23 @@ class _WeatherScreenState extends State<WeatherScreen> {
         ),
       ),
     );
+  }
+
+  void _reloadWeather() {
+    try {
+      final weatherCondition = widget._getWeather(area: 'tokyo');
+      setState(() {
+        _weatherCondition = weatherCondition;
+      });
+    } on GetWeatherException catch(e) {
+      switch (e) {
+        case UnknownException():
+          print(e);
+
+        case InvalidParameterException():
+          print(e);
+      }
+    }
   }
 }
 
