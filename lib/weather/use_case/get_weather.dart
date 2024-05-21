@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
@@ -30,7 +31,9 @@ final class GetWeather {
 
   WeatherCondition call({required String area}) {
     try {
-      final response = YumemiWeather().fetchThrowsWeather(area);
+      final request = _Request(area, DateTime.now());
+      final requestJsonString = jsonEncode(request.toJson());
+      final response = YumemiWeather().fetchWeather(requestJsonString);
       return WeatherCondition.values.byName(response);
     } on YumemiWeatherError catch(e) {
       switch (e) {
@@ -44,5 +47,19 @@ final class GetWeather {
       assert(false, 'Unexpected Exception');
       throw const UnknownException();
     }
+  }
+}
+
+class _Request {
+  const _Request(this.area, this.dateTime);
+
+  final String area;
+  final DateTime dateTime;
+
+  Map<String, String> toJson() {
+    return {
+      'area': area,
+      'date': dateTime.toString(),
+    };
   }
 }
