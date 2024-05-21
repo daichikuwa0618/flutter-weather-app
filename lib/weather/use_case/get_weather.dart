@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter_training/data/weather.dart';
-import 'package:flutter_training/data/weather_condition.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
 sealed class GetWeatherException implements Exception {

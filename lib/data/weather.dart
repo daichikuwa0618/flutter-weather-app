@@ -1,4 +1,6 @@
-import 'package:flutter_training/data/weather_condition.dart';
+enum WeatherCondition {
+  sunny, rainy, cloudy;
+}
 
 class Weather {
   const Weather({
