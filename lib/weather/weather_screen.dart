@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
@@ -62,14 +63,30 @@ class _WeatherScreenState extends State<WeatherScreen> {
         _weatherCondition = weatherCondition;
       });
     } on GetWeatherException catch(e) {
-      switch (e) {
-        case UnknownException():
-          print(e);
-
-        case InvalidParameterException():
-          print(e);
-      }
+      final message = switch (e) {
+        UnknownException() => 'Unknown error occurred. Please try again.',
+        InvalidParameterException() =>
+          'Parameter is not valid. Please check your inputs and try again.',
+      };
+      unawaited(_showErrorDialog(message));
     }
+  }
+
+  Future<void> _showErrorDialog(String message) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
