@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-mixin LayoutStateMixin<T extends StatefulWidget> on State<T> {
+mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
   void didLayoutEnded();
 
   @override
