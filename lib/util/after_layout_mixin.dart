@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
-  void didLayoutEnded();
+  FutureOr<void> didLayoutEnded();
 
   @override
   void initState() {
@@ -13,7 +13,7 @@ mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
   Future<void> _asyncInitState() async {
     await WidgetsBinding.instance.endOfFrame;
     if (mounted) {
-      didLayoutEnded();
+      await didLayoutEnded();
     }
   }
 }

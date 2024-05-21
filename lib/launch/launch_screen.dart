@@ -15,17 +15,13 @@ class LaunchScreen extends StatefulWidget {
 
 class _LaunchScreenState extends State<LaunchScreen> with AfterLayoutMixin {
   @override
-  void didLayoutEnded() {
-    unawaited(_showWeather());
-  }
-
-  Future<void> _showWeather() async {
+  Future<void> didLayoutEnded() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     if (mounted) {
       await widget._showWeather();
       // WeatherScreen にて "Close" が押された場合や iOS のエッジスワイプで戻った際に
       // 再度 WeatherScreen を表示するために再帰呼び出し
-      await _showWeather();
+      await didLayoutEnded();
     }
   }
 
