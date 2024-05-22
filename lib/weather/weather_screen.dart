@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_training/data/weather_condition.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
@@ -43,12 +44,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       closeAction: widget._close,
-                      reloadAction: () {
-                        final weatherCondition = widget._getWeather();
-                        setState(() {
-                          _weatherCondition = weatherCondition;
-                        });
-                      },
+                      reloadAction: _reloadWeather,
                     ),
                   ),
                 ),
@@ -56,6 +52,34 @@ class _WeatherScreenState extends State<WeatherScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _reloadWeather() {
+    try {
+      final weatherCondition = widget._getWeather(area: 'tokyo');
+      setState(() {
+        _weatherCondition = weatherCondition;
+      });
+    } on GetWeatherException catch(e) {
+      unawaited(_showErrorDialog(e.message));
+    }
+  }
+
+  Future<void> _showErrorDialog(String message) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
@@ -140,5 +164,15 @@ class _ButtonsRow extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+extension on GetWeatherException {
+  String get message {
+    return switch (this) {
+      UnknownException() => 'Unknown error occurred. Please try again.',
+      InvalidParameterException() =>
+      'Parameter is not valid. Please check your inputs and try again.',
+    };
   }
 }
