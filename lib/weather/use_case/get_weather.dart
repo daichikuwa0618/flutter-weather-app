@@ -1,6 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_training/data/weather.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
+
+part 'get_weather.freezed.dart';
+
+part 'get_weather.g.dart';
 
 sealed class GetWeatherException implements Exception {
   const GetWeatherException({YumemiWeatherError? rawError})
@@ -31,13 +36,13 @@ final class GetWeather {
 
   Weather call({required String area}) {
     try {
-      final request = _Request((area: area, dateTime: DateTime.now()));
+      final request = _Request(area: area, dateTime: DateTime.now());
       final requestJsonString = jsonEncode(request.toJson());
 
       final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
       final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
       return Weather.fromJson(responseJson);
-    } on YumemiWeatherError catch(e) {
+    } on YumemiWeatherError catch (e) {
       switch (e) {
         case YumemiWeatherError.unknown:
           throw UnknownException(rawError: e);
@@ -45,18 +50,20 @@ final class GetWeather {
         case YumemiWeatherError.invalidParameter:
           throw InvalidParameterException(rawError: e);
       }
-    } on Exception catch(_) {
+    } on Exception catch (_) {
       assert(false, 'Unexpected Exception');
       throw const UnknownException();
     }
   }
 }
 
-extension type _Request(({String area, DateTime dateTime}) value) {
-  Map<String, String> toJson() {
-    return {
-      'area': value.area,
-      'date': value.dateTime.toString(),
-    };
-  }
+@freezed
+class _Request with _$Request {
+  const factory _Request({
+    required String area,
+    @JsonKey(name: 'date') required DateTime dateTime,
+  }) = _RequestData;
+
+  factory _Request.fromJson(Map<String, Object?> json) =>
+      _$RequestFromJson(json);
 }
