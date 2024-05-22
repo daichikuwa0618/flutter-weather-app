@@ -1,36 +1,40 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'weather.freezed.dart';
+
+part 'weather.g.dart';
+
 enum WeatherCondition {
-  sunny, rainy, cloudy;
+  sunny,
+  rainy,
+  cloudy;
 }
 
-class Weather {
-  const Weather({
-    required this.condition,
-    required this.maxTemperature,
-    required this.minTemperature,
-    required this.date,
-  });
+@freezed
+class Weather with _$Weather {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory Weather({
+    @_WeatherConditionConverter()
+    @JsonKey(name: 'weather_condition')
+    required WeatherCondition condition,
+    required int maxTemperature,
+    required int minTemperature,
+    required DateTime date,
+  }) = _Weather;
 
-  factory Weather.fromJson(Map<dynamic, dynamic> jsonString) {
-    final conditionName = jsonString['weather_condition'].toString();
-    final condition = WeatherCondition.values.byName(conditionName);
-    final max = int.tryParse(jsonString['max_temperature'].toString());
-    final min = int.tryParse(jsonString['min_temperature'].toString());
-    final date = DateTime.tryParse(jsonString['date'].toString());
+  factory Weather.fromJson(Map<String, Object?> json) =>
+      _$WeatherFromJson(json);
+}
 
-    if (max != null && min != null && date != null) {
-      return Weather(
-        condition: condition,
-        maxTemperature: max,
-        minTemperature: min,
-        date: date,
-      );
-    } else {
-      throw const FormatException();
-    }
+class _WeatherConditionConverter
+    implements JsonConverter<WeatherCondition, String> {
+  const _WeatherConditionConverter();
+
+  @override
+  WeatherCondition fromJson(String json) {
+    return WeatherCondition.values.byName(json);
   }
 
-  final WeatherCondition condition;
-  final int maxTemperature;
-  final int minTemperature;
-  final DateTime date;
+  @override
+  String toJson(WeatherCondition weatherCondition) => weatherCondition.name;
 }
