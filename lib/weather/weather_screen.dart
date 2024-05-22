@@ -34,11 +34,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
               //       [flex: 1] を設定してある [Spacer] および [Expanded] で挟んでいる。
               //       [Column] に要素を追加すると上下中央のレイアウトが崩れるため注意。
               const Spacer(),
-              _ForecastContent(
-                weatherCondition: _weather?.condition,
-                maxTemperature: _weather?.maxTemperature,
-                minTemperature: _weather?.minTemperature,
-              ),
+              _ForecastContent(weather: _weather),
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
@@ -88,17 +84,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 }
 
 class _ForecastContent extends StatelessWidget {
-  const _ForecastContent({
-    required WeatherCondition? weatherCondition,
-    required int? maxTemperature,
-    required int? minTemperature,
-  })  : _weatherCondition = weatherCondition,
-        _maxTemperature = maxTemperature,
-        _mixTemperature = minTemperature;
+  const _ForecastContent({required Weather? weather}) : _weather = weather;
 
-  final WeatherCondition? _weatherCondition;
-  final int? _maxTemperature;
-  final int? _mixTemperature;
+  final Weather? _weather;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +95,7 @@ class _ForecastContent extends StatelessWidget {
     return Column(
       children: [
         WeatherIcon(
-          weatherCondition: _weatherCondition,
+          weatherCondition: _weather?.condition,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -115,7 +103,7 @@ class _ForecastContent extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${_mixTemperature ?? '**'} ℃',
+                  '${_weather?.minTemperature ?? '**'} ℃',
                   textAlign: TextAlign.center,
                   style: textTheme.labelLarge?.copyWith(
                     color: Colors.blue,
@@ -124,7 +112,7 @@ class _ForecastContent extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '${_maxTemperature ?? '**'} ℃',
+                  '${_weather?.maxTemperature ?? '**'} ℃',
                   textAlign: TextAlign.center,
                   style: textTheme.labelLarge?.copyWith(
                     color: Colors.red,
