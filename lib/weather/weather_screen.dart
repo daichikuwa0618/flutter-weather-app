@@ -63,12 +63,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
         _weatherCondition = weatherCondition;
       });
     } on GetWeatherException catch(e) {
-      final message = switch (e) {
-        UnknownException() => 'Unknown error occurred. Please try again.',
-        InvalidParameterException() =>
-          'Parameter is not valid. Please check your inputs and try again.',
-      };
-      unawaited(_showErrorDialog(message));
+      unawaited(_showErrorDialog(e.message));
     }
   }
 
@@ -169,5 +164,15 @@ class _ButtonsRow extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+extension on GetWeatherException {
+  String get message {
+    return switch (this) {
+      UnknownException() => 'Unknown error occurred. Please try again.',
+      InvalidParameterException() =>
+      'Parameter is not valid. Please check your inputs and try again.',
+    };
   }
 }
