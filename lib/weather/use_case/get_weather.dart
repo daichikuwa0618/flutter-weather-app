@@ -15,14 +15,14 @@ final class UnknownException extends GetWeatherException {
   const UnknownException({super.rawError});
 
   @override
-  String toString() => 'Unknown Exception: $_rawError';
+  String toString() => 'Unknown Exception: ${super.toString()}';
 }
 
 final class InvalidParameterException extends GetWeatherException {
   const InvalidParameterException({super.rawError});
 
   @override
-  String toString() => 'Parameter is not valid: $_rawError';
+  String toString() => 'Parameter is not valid: ${super.toString()}';
 }
 
 final class GetWeather {
