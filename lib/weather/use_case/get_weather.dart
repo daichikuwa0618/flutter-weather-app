@@ -36,13 +36,7 @@ final class GetWeather {
 
       final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
       final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
-      final response = _Response.fromJson(responseJson);
-      return Weather(
-        condition: response.condition,
-        maxTemperature: response.maxTemperature,
-        minTemperature: response.minTemperature,
-        date: response.date,
-      );
+      return Weather.fromJson(responseJson);
     } on YumemiWeatherError catch(e) {
       switch (e) {
         case YumemiWeatherError.unknown:
@@ -65,37 +59,4 @@ extension type _Request(({String area, DateTime dateTime}) value) {
       'date': value.dateTime.toString(),
     };
   }
-}
-
-class _Response {
-  const _Response({
-    required this.condition,
-    required this.maxTemperature,
-    required this.minTemperature,
-    required this.date,
-  });
-
-  factory _Response.fromJson(Map<dynamic, dynamic> jsonString) {
-    final conditionName = jsonString['weather_condition'].toString();
-    final condition = WeatherCondition.values.byName(conditionName);
-    final max = int.tryParse(jsonString['max_temperature'].toString());
-    final min = int.tryParse(jsonString['min_temperature'].toString());
-    final date = DateTime.tryParse(jsonString['date'].toString());
-
-    if (max != null && min != null && date != null) {
-      return _Response(
-        condition: condition,
-        maxTemperature: max,
-        minTemperature: min,
-        date: date,
-      );
-    } else {
-      throw const FormatException();
-    }
-  }
-
-  final WeatherCondition condition;
-  final int maxTemperature;
-  final int minTemperature;
-  final DateTime date;
 }
