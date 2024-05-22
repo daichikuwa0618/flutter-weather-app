@@ -31,7 +31,7 @@ final class GetWeather {
 
   Weather call({required String area}) {
     try {
-      final request = _Request(area, DateTime.now());
+      final request = _Request((area: area, dateTime: DateTime.now()));
       final requestJsonString = jsonEncode(request.toJson());
 
       final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
@@ -58,16 +58,11 @@ final class GetWeather {
   }
 }
 
-class _Request {
-  const _Request(this.area, this.dateTime);
-
-  final String area;
-  final DateTime dateTime;
-
+extension type _Request(({String area, DateTime dateTime}) value) {
   Map<String, String> toJson() {
     return {
-      'area': area,
-      'date': dateTime.toString(),
+      'area': value.area,
+      'date': value.dateTime.toString(),
     };
   }
 }
