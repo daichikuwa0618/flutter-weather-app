@@ -57,15 +57,10 @@ final class GetWeather {
   }
 }
 
-@freezed
+@Freezed(toJson: true)
 class _Request with _$Request {
   const factory _Request({
     required String area,
     @JsonKey(name: 'date') required DateTime dateTime,
   }) = _RequestData;
-
-  // `fromJson` は `toJson` 生成のための実装で未使用になるのは避けられないため;
-  // ignore: unused_element
-  factory _Request.fromJson(Map<String, Object?> json) =>
-      _$RequestFromJson(json);
 }
