@@ -39,3 +39,36 @@ router -- resolve Screens' dependencies --> Features
 UseCase --> YW
 UseCase ~~~ CM
 ```
+
+## Provider 同士の依存関係
+
+[Session8 · Issue #9 · daichikuwa0618/flutter-weather-app](https://github.com/daichikuwa0618/flutter-weather-app/issues/9) の課題の一環で作成。
+
+```mermaid
+flowchart TB
+  subgraph Arrows
+    direction LR
+    start1[ ] -..->|read| stop1[ ]
+    style start1 height:0px;
+    style stop1 height:0px;
+    start2[ ] --->|listen| stop2[ ]
+    style start2 height:0px;
+    style stop2 height:0px;
+    start3[ ] ===>|watch| stop3[ ]
+    style start3 height:0px;
+    style stop3 height:0px;
+  end
+  subgraph Type
+    direction TB
+    ConsumerWidget((widget));
+    Provider[[provider]];
+  end
+
+  Arrows ~~~ Type
+
+  weatherNotifierProvider[["weatherNotifierProvider"]];
+  WeatherScreen((WeatherScreen));
+
+  weatherNotifierProvider ==> WeatherScreen;
+  weatherNotifierProvider -.-> WeatherScreen;
+```
