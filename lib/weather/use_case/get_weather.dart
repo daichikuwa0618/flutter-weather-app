@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_training/data/weather.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
 part 'get_weather.freezed.dart';
@@ -31,29 +32,26 @@ final class InvalidParameterException extends GetWeatherException {
   String toString() => 'Parameter is not valid: ${super.toString()}';
 }
 
-final class GetWeather {
-  const GetWeather();
+@riverpod
+Weather getWeather(GetWeatherRef ref, {required String area}) {
+  try {
+    final request = _Request(area: area, dateTime: DateTime.now());
+    final requestJsonString = jsonEncode(request.toJson());
 
-  Weather call({required String area}) {
-    try {
-      final request = _Request(area: area, dateTime: DateTime.now());
-      final requestJsonString = jsonEncode(request.toJson());
+    final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
+    final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
+    return Weather.fromJson(responseJson);
+  } on YumemiWeatherError catch (e) {
+    switch (e) {
+      case YumemiWeatherError.unknown:
+        throw UnknownException(rawError: e);
 
-      final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
-      final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
-      return Weather.fromJson(responseJson);
-    } on YumemiWeatherError catch (e) {
-      switch (e) {
-        case YumemiWeatherError.unknown:
-          throw UnknownException(rawError: e);
-
-        case YumemiWeatherError.invalidParameter:
-          throw InvalidParameterException(rawError: e);
-      }
-    } on Exception catch (_) {
-      assert(false, 'Unexpected Exception');
-      throw const UnknownException();
+      case YumemiWeatherError.invalidParameter:
+        throw InvalidParameterException(rawError: e);
     }
+  } on Exception catch (_) {
+    assert(false, 'Unexpected Exception');
+    throw const UnknownException();
   }
 }
 

@@ -1,25 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
 
-class WeatherScreen extends StatefulWidget {
-  const WeatherScreen(
-    GetWeather getWeather, {
-    required VoidCallback close,
-    super.key,
-  })  : _getWeather = getWeather,
-        _close = close;
+class WeatherScreen extends ConsumerStatefulWidget {
+  const WeatherScreen({required VoidCallback close, super.key}): _close = close;
 
-  final GetWeather _getWeather;
   final VoidCallback _close;
 
   @override
-  State<WeatherScreen> createState() => _WeatherScreenState();
+  ConsumerState<WeatherScreen> createState() => _WeatherScreenState();
 }
 
-class _WeatherScreenState extends State<WeatherScreen> {
+class _WeatherScreenState extends ConsumerState<WeatherScreen> {
   Weather? _weather;
 
   @override
@@ -42,7 +37,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       closeAction: widget._close,
-                      reloadAction: _reloadWeather,
+                      reloadAction: () => _reloadWeather(ref),
                     ),
                   ),
                 ),
@@ -54,13 +49,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  void _reloadWeather() {
+  void _reloadWeather(WidgetRef ref) {
     try {
-      final weather = widget._getWeather(area: 'tokyo');
+      final weather = ref.read(getWeatherProvider(area: 'tokyo'));
       setState(() {
         _weather = weather;
       });
-    } on GetWeatherException catch(e) {
+    } on GetWeatherException catch (e) {
       unawaited(_showErrorDialog(e.message));
     }
   }
@@ -169,7 +164,7 @@ extension on GetWeatherException {
     return switch (this) {
       UnknownException() => 'Unknown error occurred. Please try again.',
       InvalidParameterException() =>
-      'Parameter is not valid. Please check your inputs and try again.',
+        'Parameter is not valid. Please check your inputs and try again.',
     };
   }
 }
