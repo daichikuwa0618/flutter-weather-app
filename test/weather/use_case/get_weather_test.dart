@@ -7,6 +7,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
+import '../../util/create_container.dart';
 import 'get_weather_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<YumemiWeather>()])
@@ -17,7 +18,7 @@ void main() {
     mockYumemiWeather = MockYumemiWeather();
   });
 
-  ProviderContainer createContainer() => ProviderContainer(
+  ProviderContainer createMockContainer() => createContainer(
         overrides: [
           yumemiWeatherProvider.overrideWith((ref) => mockYumemiWeather),
         ],
@@ -26,7 +27,7 @@ void main() {
   group('Test GetWeather UseCase', () {
     test('正常レスポンスで適切な Weather が返却される', () {
       // Arrange
-      final container = createContainer();
+      final container = createMockContainer();
       final date = DateTime(2024, 4);
       final result = '''
       {
@@ -56,7 +57,7 @@ void main() {
 
     test('YumemiWeather.unknown の場合は UnknownException', () {
       // Arrange
-      final container = createContainer();
+      final container = createMockContainer();
       when(mockYumemiWeather.fetchWeather(any))
           .thenThrow(YumemiWeatherError.unknown);
 
@@ -72,7 +73,7 @@ void main() {
 
     test('YumemiWeather.invalidParameter の場合は InvalidParameterException', () {
       // Arrange
-      final container = createContainer();
+      final container = createMockContainer();
       when(mockYumemiWeather.fetchWeather(any))
           .thenThrow(YumemiWeatherError.invalidParameter);
 
