@@ -32,27 +32,31 @@ final class InvalidParameterException extends GetWeatherException {
   String toString() => 'Parameter is not valid: ${super.toString()}';
 }
 
+typedef GetWeatherUseCase = Weather Function({required String area});
+
 @riverpod
-Weather getWeather(GetWeatherRef ref, {required String area}) {
-  try {
-    final request = _Request(area: area, dateTime: DateTime.now());
-    final requestJsonString = jsonEncode(request.toJson());
+GetWeatherUseCase getWeather(GetWeatherRef ref) {
+  return ({required area}) {
+    try {
+      final request = _Request(area: area, dateTime: DateTime.now());
+      final requestJsonString = jsonEncode(request.toJson());
 
-    final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
-    final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
-    return Weather.fromJson(responseJson);
-  } on YumemiWeatherError catch (e) {
-    switch (e) {
-      case YumemiWeatherError.unknown:
-        throw UnknownException(rawError: e);
+      final rawResponse = YumemiWeather().fetchWeather(requestJsonString);
+      final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
+      return Weather.fromJson(responseJson);
+    } on YumemiWeatherError catch (e) {
+      switch (e) {
+        case YumemiWeatherError.unknown:
+          throw UnknownException(rawError: e);
 
-      case YumemiWeatherError.invalidParameter:
-        throw InvalidParameterException(rawError: e);
+        case YumemiWeatherError.invalidParameter:
+          throw InvalidParameterException(rawError: e);
+      }
+    } on Exception catch (_) {
+      assert(false, 'Unexpected Exception');
+      throw const UnknownException();
     }
-  } on Exception catch (_) {
-    assert(false, 'Unexpected Exception');
-    throw const UnknownException();
-  }
+  };
 }
 
 @Freezed(toJson: true)
