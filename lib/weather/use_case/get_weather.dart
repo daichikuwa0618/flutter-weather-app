@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_training/data/weather.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
 part 'get_weather.freezed.dart';
@@ -31,10 +32,11 @@ final class InvalidParameterException extends GetWeatherException {
   String toString() => 'Parameter is not valid: ${super.toString()}';
 }
 
-final class GetWeather {
-  const GetWeather();
+typedef GetWeatherUseCase = Weather Function({required String area});
 
-  Weather call({required String area}) {
+@riverpod
+GetWeatherUseCase getWeather(GetWeatherRef ref) {
+  return ({required area}) {
     try {
       final request = _Request(area: area, dateTime: DateTime.now());
       final requestJsonString = jsonEncode(request.toJson());
@@ -54,18 +56,13 @@ final class GetWeather {
       assert(false, 'Unexpected Exception');
       throw const UnknownException();
     }
-  }
+  };
 }
 
-@freezed
+@Freezed(toJson: true)
 class _Request with _$Request {
   const factory _Request({
     required String area,
     @JsonKey(name: 'date') required DateTime dateTime,
   }) = _RequestData;
-
-  // `fromJson` は `toJson` 生成のための実装で未使用になるのは避けられないため;
-  // ignore: unused_element
-  factory _Request.fromJson(Map<String, Object?> json) =>
-      _$RequestFromJson(json);
 }

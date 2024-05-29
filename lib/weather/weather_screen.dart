@@ -1,29 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class WeatherScreen extends StatefulWidget {
-  const WeatherScreen(
-    GetWeather getWeather, {
-    required VoidCallback close,
-    super.key,
-  })  : _getWeather = getWeather,
-        _close = close;
+part 'weather_screen.g.dart';
 
-  final GetWeather _getWeather;
+@riverpod
+class WeatherNotifier extends _$WeatherNotifier {
+  @override
+  Weather? build() => null;
+
+  void update({required String area}) {
+    state = ref.read(getWeatherProvider)(area: area);
+  }
+}
+
+class WeatherScreen extends ConsumerWidget {
+  const WeatherScreen({required VoidCallback close, super.key})
+      : _close = close;
+
   final VoidCallback _close;
 
   @override
-  State<WeatherScreen> createState() => _WeatherScreenState();
-}
-
-class _WeatherScreenState extends State<WeatherScreen> {
-  Weather? _weather;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weather = ref.watch(weatherNotifierProvider);
     return Scaffold(
       body: Center(
         child: FractionallySizedBox(
@@ -34,15 +37,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
               //       [flex: 1] を設定してある [Spacer] および [Expanded] で挟んでいる。
               //       [Column] に要素を追加すると上下中央のレイアウトが崩れるため注意。
               const Spacer(),
-              _ForecastContent(weather: _weather),
+              _ForecastContent(weather: weather),
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
-                      closeAction: widget._close,
-                      reloadAction: _reloadWeather,
+                      closeAction: _close,
+                      reloadAction: () => _reloadWeather(context, ref),
                     ),
                   ),
                 ),
@@ -54,18 +57,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  void _reloadWeather() {
+  void _reloadWeather(BuildContext context, WidgetRef ref) {
     try {
-      final weather = widget._getWeather(area: 'tokyo');
-      setState(() {
-        _weather = weather;
-      });
-    } on GetWeatherException catch(e) {
-      unawaited(_showErrorDialog(e.message));
+      ref.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    } on GetWeatherException catch (e) {
+      unawaited(_showErrorDialog(context, e.message));
     }
   }
 
-  Future<void> _showErrorDialog(String message) async {
+  Future<void> _showErrorDialog(BuildContext context, String message) async {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -169,7 +169,7 @@ extension on GetWeatherException {
     return switch (this) {
       UnknownException() => 'Unknown error occurred. Please try again.',
       InvalidParameterException() =>
-      'Parameter is not valid. Please check your inputs and try again.',
+        'Parameter is not valid. Please check your inputs and try again.',
     };
   }
 }
