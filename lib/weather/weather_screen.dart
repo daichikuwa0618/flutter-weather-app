@@ -14,7 +14,7 @@ class WeatherNotifier extends _$WeatherNotifier {
   Weather? build() => null;
 
   void update({required String area}) {
-    state = ref.read(getWeatherProvider)(area: 'tokyo');
+    state = ref.read(getWeatherProvider)(area: area);
   }
 }
 
