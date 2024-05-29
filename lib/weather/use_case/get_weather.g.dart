@@ -16,7 +16,7 @@ Map<String, dynamic> _$$RequestDataImplToJson(_$RequestDataImpl instance) =>
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getWeatherHash() => r'619c66e7859a7911f3af8df46f5819debc822884';
+String _$getWeatherHash() => r'd213c84b8d556a43f26ff96163e469ac370ec236';
 
 /// See also [getWeather].
 @ProviderFor(getWeather)

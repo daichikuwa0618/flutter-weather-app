@@ -13,8 +13,8 @@ class WeatherNotifier extends _$WeatherNotifier {
   @override
   Weather? build() => null;
 
-  void update({required String area}) {
-    state = ref.read(getWeatherProvider)(area: area);
+  Future<void> update({required String area}) async {
+    state = await ref.read(getWeatherProvider)(area: area);
   }
 }
 

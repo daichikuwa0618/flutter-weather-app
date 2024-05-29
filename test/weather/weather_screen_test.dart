@@ -46,8 +46,8 @@ void main() {
           ProviderScope(
             overrides: [
               getWeatherProvider.overrideWith(
-                (ref) =>
-                    ({required area}) => weather.copyWith(condition: condition),
+                (ref) => ({required area}) async =>
+                    weather.copyWith(condition: condition),
               ),
             ],
             child: MaterialApp(

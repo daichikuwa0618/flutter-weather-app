@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/infrastructure/weather_api.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -33,17 +34,18 @@ final class InvalidParameterException extends GetWeatherException {
   String toString() => 'Parameter is not valid: ${super.toString()}';
 }
 
-typedef GetWeatherUseCase = Weather Function({required String area});
+typedef GetWeatherUseCase = Future<Weather> Function({required String area});
 
 @riverpod
 GetWeatherUseCase getWeather(GetWeatherRef ref) {
-  return ({required area}) {
+  return ({required area}) async {
     try {
       final request = _Request(area: area, dateTime: DateTime.now());
       final requestJsonString = jsonEncode(request.toJson());
 
+      final yumemiWeather = ref.read(yumemiWeatherProvider);
       final rawResponse =
-          ref.read(yumemiWeatherProvider).fetchWeather(requestJsonString);
+          await compute(yumemiWeather.syncFetchWeather, requestJsonString);
       final responseJson = jsonDecode(rawResponse) as Map<String, dynamic>;
       return Weather.fromJson(responseJson);
     } on YumemiWeatherError catch (e) {
