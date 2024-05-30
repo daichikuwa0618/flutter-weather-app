@@ -45,7 +45,8 @@ class WeatherScreen extends ConsumerWidget {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       closeAction: _close,
-                      reloadAction: () => _reloadWeather(context, ref),
+                      reloadAction: () =>
+                          unawaited(_reloadWeather(context, ref)),
                     ),
                   ),
                 ),
@@ -57,11 +58,14 @@ class WeatherScreen extends ConsumerWidget {
     );
   }
 
-  void _reloadWeather(BuildContext context, WidgetRef ref) {
+  Future<void> _reloadWeather(BuildContext context, WidgetRef ref) async {
     try {
-      ref.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+      await ref.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
     } on GetWeatherException catch (e) {
-      unawaited(_showErrorDialog(context, e.message));
+      if (!context.mounted) {
+        return;
+      }
+      await _showErrorDialog(context, e.message);
     }
   }
 
