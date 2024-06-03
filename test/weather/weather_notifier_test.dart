@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_screen.dart';
-import 'package:yumemi_weather/yumemi_weather.dart';
 
 import '../util/create_container.dart';
 
@@ -34,7 +33,6 @@ void main() {
 
     test('成功 → 成功で状態が変わる', () {
       // Arrange
-      var count = 0;
       final date = DateTime(2024, 4);
       final result = Weather(
         condition: WeatherCondition.cloudy,
@@ -42,17 +40,15 @@ void main() {
         minTemperature: 7,
         date: date,
       );
+      final results = [
+        result,
+        result.copyWith(maxTemperature: 100),
+      ];
 
       final container = createContainer(
         overrides: [
           getWeatherProvider.overrideWith((ref) {
-            return ({required area}) {
-              if (count == 0) {
-                return result;
-              } else {
-                return result.copyWith(maxTemperature: 100);
-              }
-            };
+            return ({required area}) => results.removeAt(0);
           }),
         ],
       );
@@ -62,7 +58,6 @@ void main() {
       expect(initialState, null); // 初期状態は null
 
       container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-      count++;
 
       final weather = container.read(weatherNotifierProvider);
       expect(weather, result); // 成功して状態が変わる
@@ -75,7 +70,6 @@ void main() {
 
     test('成功 → 失敗で状態がそのまま', () {
       // Arrange
-      var count = 0;
       final date = DateTime(2024, 4);
       final result = Weather(
         condition: WeatherCondition.cloudy,
@@ -83,19 +77,15 @@ void main() {
         minTemperature: 7,
         date: date,
       );
+      final results = [
+        () => result,
+        () => throw const UnknownException(),
+      ];
 
       final container = createContainer(
         overrides: [
           getWeatherProvider.overrideWith((ref) {
-            return ({required area}) {
-              if (count == 0) {
-                return result;
-              } else {
-                throw const UnknownException(
-                  rawError: YumemiWeatherError.unknown,
-                );
-              }
-            };
+            return ({required area}) => results.removeAt(0).call();
           }),
         ],
       );
@@ -105,7 +95,6 @@ void main() {
       expect(initialState, null); // 初期状態は null
 
       container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-      count++;
 
       final weather = container.read(weatherNotifierProvider);
       expect(weather, result); // 成功して状態が変わる
