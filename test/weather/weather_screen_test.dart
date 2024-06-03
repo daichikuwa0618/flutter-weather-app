@@ -9,13 +9,6 @@ import 'package:flutter_training/weather/weather_screen.dart';
 import 'package:yumemi_weather/yumemi_weather.dart';
 
 void main() {
-  final weather = Weather(
-    condition: WeatherCondition.sunny,
-    maxTemperature: 100,
-    minTemperature: 0,
-    date: DateTime.now(),
-  );
-
   group('Test WeatherScreen', () {
     testWidgets('天気情報が未取得の場合は Placeholder', (tester) async {
       await tester.pumpWidget(
@@ -32,90 +25,48 @@ void main() {
       expect(find.text('** ℃'), findsNWidgets(2));
     });
 
-    testWidgets('天気情報が晴れ', (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1080, 1920);
+    final cases = [
+      (WeatherCondition.sunny, 'assets/sunny.svg'),
+      (WeatherCondition.cloudy, 'assets/cloudy.svg'),
+      (WeatherCondition.rainy, 'assets/rainy.svg'),
+    ];
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            getWeatherProvider
-                .overrideWith((ref) => ({required area}) => weather),
-          ],
-          child: MaterialApp(
-            home: WeatherScreen(
-              close: () {},
+    for (final (condition, svg) in cases) {
+      testWidgets('天気情報が ${condition.name} の場合に $svg が表示される', (tester) async {
+        final weather = Weather(
+          condition: WeatherCondition.sunny,
+          maxTemperature: 100,
+          minTemperature: 0,
+          date: DateTime.now(),
+        );
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = const Size(1080, 1920);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              getWeatherProvider.overrideWith(
+                (ref) =>
+                    ({required area}) => weather.copyWith(condition: condition),
+              ),
+            ],
+            child: MaterialApp(
+              home: WeatherScreen(
+                close: () {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Reload'));
-      await tester.pump();
+        await tester.tap(find.text('Reload'));
+        await tester.pump();
 
-      final asset = SvgPicture.asset('assets/sunny.svg');
-      expect(find.svg(asset.bytesLoader), findsOneWidget);
-      expect(find.text('100 ℃'), findsOneWidget);
-      expect(find.text('0 ℃'), findsOneWidget);
-    });
-
-    testWidgets('天気情報が曇り', (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1080, 1920);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            getWeatherProvider.overrideWith(
-              (ref) => ({required area}) =>
-                  weather.copyWith(condition: WeatherCondition.cloudy),
-            ),
-          ],
-          child: MaterialApp(
-            home: WeatherScreen(
-              close: () {},
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Reload'));
-      await tester.pump();
-
-      final asset = SvgPicture.asset('assets/cloudy.svg');
-      expect(find.svg(asset.bytesLoader), findsOneWidget);
-      expect(find.text('100 ℃'), findsOneWidget);
-      expect(find.text('0 ℃'), findsOneWidget);
-    });
-
-    testWidgets('天気情報が雨', (tester) async {
-      tester.view.devicePixelRatio = 1;
-      tester.view.physicalSize = const Size(1080, 1920);
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            getWeatherProvider.overrideWith(
-              (ref) => ({required area}) =>
-                  weather.copyWith(condition: WeatherCondition.rainy),
-            ),
-          ],
-          child: MaterialApp(
-            home: WeatherScreen(
-              close: () {},
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Reload'));
-      await tester.pump();
-
-      final asset = SvgPicture.asset('assets/rainy.svg');
-      expect(find.svg(asset.bytesLoader), findsOneWidget);
-      expect(find.text('100 ℃'), findsOneWidget);
-      expect(find.text('0 ℃'), findsOneWidget);
-    });
+        final asset = SvgPicture.asset(svg);
+        expect(find.svg(asset.bytesLoader), findsOneWidget);
+        expect(find.text('100 ℃'), findsOneWidget);
+        expect(find.text('0 ℃'), findsOneWidget);
+      });
+    }
 
     testWidgets('エラーダイアログ', (tester) async {
       tester.view.devicePixelRatio = 1;
