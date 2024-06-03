@@ -6,107 +6,60 @@ import 'package:flutter_training/weather/weather_screen.dart';
 import '../util/create_container.dart';
 
 void main() {
-  group('Test WeatherNotifier State', () {
-    test('初回の reload で取得成功: null -> Weather', () {
-      final date = DateTime(2024, 4);
-      final result = Weather(
-        condition: WeatherCondition.cloudy,
-        maxTemperature: 25,
-        minTemperature: 7,
-        date: date,
-      );
-      final container = createContainer(
-        overrides: [
-          getWeatherProvider.overrideWith((ref) => ({required area}) => result),
-        ],
-      );
-      final initialState = container.read(weatherNotifierProvider);
-      expect(initialState, null);
+  test('GetWeather の状態に応じて WeatherState が適切に更新される', () {
+    final date = DateTime(2024, 4);
+    final result1 = Weather(
+      condition: WeatherCondition.cloudy,
+      maxTemperature: 25,
+      minTemperature: 7,
+      date: date,
+    );
+    final result2 = Weather(
+      condition: WeatherCondition.sunny,
+      maxTemperature: 100,
+      minTemperature: 7,
+      date: date,
+    );
+    final result3 = Weather(
+      condition: WeatherCondition.rainy,
+      maxTemperature: 10,
+      minTemperature: -7,
+      date: date,
+    );
+    final results = [
+      () => result1,
+      () => result2,
+      () => throw const UnknownException(),
+      () => result3,
+    ];
+    final container = createContainer(
+      overrides: [
+        getWeatherProvider.overrideWith(
+          (ref) => ({required area}) => results.removeAt(0).call(),
+        ),
+      ],
+    );
+    final history = <Weather?>[];
+    container.listen(
+      weatherNotifierProvider,
+      (previous, next) => history.add(next),
+    );
+    final initialState = container.read(weatherNotifierProvider);
+    expect(initialState, null); // 初期状態は null
 
-      // Act
-      container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    // Act
+    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    expect(
+      () => container
+          .read(weatherNotifierProvider.notifier)
+          .update(area: 'tokyo'),
+      throwsA(isA<UnknownException>()),
+    );
+    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
 
-      // Assert
-      final weather = container.read(weatherNotifierProvider);
-      expect(weather, result);
-    });
-
-    test('成功 → 成功で状態が変わる', () {
-      // Arrange
-      final date = DateTime(2024, 4);
-      final result = Weather(
-        condition: WeatherCondition.cloudy,
-        maxTemperature: 25,
-        minTemperature: 7,
-        date: date,
-      );
-      final results = [
-        result,
-        result.copyWith(maxTemperature: 100),
-      ];
-
-      final container = createContainer(
-        overrides: [
-          getWeatherProvider.overrideWith((ref) {
-            return ({required area}) => results.removeAt(0);
-          }),
-        ],
-      );
-
-      // Act & Assert
-      final initialState = container.read(weatherNotifierProvider);
-      expect(initialState, null); // 初期状態は null
-
-      container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-
-      final weather = container.read(weatherNotifierProvider);
-      expect(weather, result); // 成功して状態が変わる
-
-      container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-      final weather2 = container.read(weatherNotifierProvider);
-      final expected2 = result.copyWith(maxTemperature: 100);
-      expect(weather2, expected2); // 状態は変わっていない
-    });
-
-    test('成功 → 失敗で状態がそのまま', () {
-      // Arrange
-      final date = DateTime(2024, 4);
-      final result = Weather(
-        condition: WeatherCondition.cloudy,
-        maxTemperature: 25,
-        minTemperature: 7,
-        date: date,
-      );
-      final results = [
-        () => result,
-        () => throw const UnknownException(),
-      ];
-
-      final container = createContainer(
-        overrides: [
-          getWeatherProvider.overrideWith((ref) {
-            return ({required area}) => results.removeAt(0).call();
-          }),
-        ],
-      );
-
-      // Act & Assert
-      final initialState = container.read(weatherNotifierProvider);
-      expect(initialState, null); // 初期状態は null
-
-      container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-
-      final weather = container.read(weatherNotifierProvider);
-      expect(weather, result); // 成功して状態が変わる
-
-      expect(
-        () => container
-            .read(weatherNotifierProvider.notifier)
-            .update(area: 'tokyo'),
-        throwsA(isA<UnknownException>()),
-      );
-      final weather2 = container.read(weatherNotifierProvider);
-      expect(weather2, result); // 状態は変わっていない
-    });
+    // Assert
+    final expectations = [result1, result2, result3];
+    expect(history, expectations);
   });
 }
