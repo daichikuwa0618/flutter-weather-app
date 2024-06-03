@@ -59,7 +59,7 @@ void main() {
         );
 
         await tester.tap(find.text('Reload'));
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         final asset = SvgPicture.asset(svg);
         expect(find.svg(asset.bytesLoader), findsOneWidget);
@@ -90,7 +90,7 @@ void main() {
       );
 
       await tester.tap(find.text('Reload'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text('Error'), findsOneWidget);
@@ -102,7 +102,7 @@ void main() {
 
       // OK ボタンタップでダイアログが閉じる
       await tester.tap(find.text('OK'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsNothing);
     });
