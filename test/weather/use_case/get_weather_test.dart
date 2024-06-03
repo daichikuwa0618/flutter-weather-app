@@ -64,7 +64,7 @@ void main() {
       // Act + Assert
       expect(
         () => container.read(getWeatherProvider)(area: 'tokyo'),
-        throwsA(const TypeMatcher<UnknownException>()),
+        throwsA(isA<UnknownException>()),
       );
 
       // Assert
@@ -80,7 +80,7 @@ void main() {
       // Act + Assert
       expect(
         () => container.read(getWeatherProvider)(area: 'tokyo'),
-        throwsA(const TypeMatcher<InvalidParameterException>()),
+        throwsA(isA<InvalidParameterException>()),
       );
 
       // Assert

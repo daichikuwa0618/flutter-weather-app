@@ -114,7 +114,7 @@ void main() {
         () => container
             .read(weatherNotifierProvider.notifier)
             .update(area: 'tokyo'),
-        throwsA(const TypeMatcher<UnknownException>()),
+        throwsA(isA<UnknownException>()),
       );
       final weather2 = container.read(weatherNotifierProvider);
       expect(weather2, result); // 状態は変わっていない
