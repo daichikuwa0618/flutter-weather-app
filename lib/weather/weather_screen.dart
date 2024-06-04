@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_training/data/weather.dart';
+import 'package:flutter_training/util/show_loading_dialog.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_icon.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,6 +28,7 @@ class WeatherScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weather = ref.watch(weatherNotifierProvider);
+
     return Scaffold(
       body: Center(
         child: FractionallySizedBox(
@@ -45,8 +47,7 @@ class WeatherScreen extends ConsumerWidget {
                     padding: const EdgeInsets.only(top: 80),
                     child: _ButtonsRow(
                       closeAction: _close,
-                      reloadAction: () =>
-                          unawaited(_reloadWeather(context, ref)),
+                      reloadAction: () => unawaited(_reload(context, ref)),
                     ),
                   ),
                 ),
@@ -58,15 +59,16 @@ class WeatherScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _reloadWeather(BuildContext context, WidgetRef ref) async {
-    try {
-      await ref.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-    } on GetWeatherException catch (e) {
-      if (!context.mounted) {
-        return;
+  Future<void> _reload(BuildContext context, WidgetRef ref) async {
+    await showLoadingDialog(context, () async {
+      try {
+        await ref.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+      } on GetWeatherException catch (e) {
+        if (context.mounted) {
+          await _showErrorDialog(context, e.message);
+        }
       }
-      await _showErrorDialog(context, e.message);
-    }
+    });
   }
 
   Future<void> _showErrorDialog(BuildContext context, String message) async {
