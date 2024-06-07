@@ -2,8 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_training/data/weather.dart';
 import 'package:flutter_training/weather/use_case/get_weather.dart';
 import 'package:flutter_training/weather/weather_screen.dart';
+import 'package:mockito/mockito.dart';
 
 import '../util/create_container.dart';
+
+class MockCallback extends Mock {
+  void call(Weather? previous, Weather? next);
+}
 
 void main() {
   test('GetWeather の状態に応じて WeatherState が適切に更新される', () {
@@ -32,6 +37,10 @@ void main() {
       () => throw const UnknownException(),
       () => result3,
     ];
+
+    final callback = MockCallback();
+    when(callback.call(any, any)).thenReturn(null);
+
     final container = createContainer(
       overrides: [
         getWeatherProvider.overrideWith(
@@ -39,13 +48,14 @@ void main() {
         ),
       ],
     );
-    final history = <Weather?>[];
     container.listen(
       weatherNotifierProvider,
-      (previous, next) => history.add(next),
+      // `callback.call` をそのまま渡すと `container.listen` の方でエラーになる。
+      // `MockCallback.call({Weather? previous, Weather? next})` のように名前付き引数にすると
+      // 解決するものの、ここ以外が冗長な見た目になるので、ここだけ無視する。
+      // ignore: unnecessary_lambdas
+      (previous, next) => callback.call(previous, next),
     );
-    final initialState = container.read(weatherNotifierProvider);
-    expect(initialState, null); // 初期状態は null
 
     // Act
     container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
@@ -59,7 +69,10 @@ void main() {
     container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
 
     // Assert
-    final expectations = [result1, result2, result3];
-    expect(history, expectations);
+    verifyInOrder([
+      callback.call(null, result1),
+      callback.call(result1, result2),
+      callback.call(result2, result3),
+    ]);
   });
 }
