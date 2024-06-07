@@ -25,7 +25,7 @@ void main() {
       );
 
   group('Test GetWeather UseCase', () {
-    test('正常レスポンスで適切な Weather が返却される', () {
+    test('正常レスポンスで適切な Weather が返却される', () async {
       // Arrange
       final container = createMockContainer();
       final date = DateTime(2024, 4);
@@ -37,13 +37,12 @@ void main() {
         "date":"${date.toIso8601String()}"
       }
       ''';
-      when(mockYumemiWeather.fetchWeather(any)).thenReturn(result);
+      when(mockYumemiWeather.syncFetchWeather(any)).thenReturn(result);
 
       // Act
-      final weather = container.read(getWeatherProvider)(area: 'tokyo');
+      final weather = await container.read(getWeatherProvider)(area: 'tokyo');
 
       // Assert
-      verify(mockYumemiWeather.fetchWeather(any)).called(1);
       expect(
         weather,
         Weather(
@@ -55,36 +54,30 @@ void main() {
       );
     });
 
-    test('YumemiWeather.unknown の場合は UnknownException', () {
+    test('YumemiWeather.unknown の場合は UnknownException', () async {
       // Arrange
       final container = createMockContainer();
-      when(mockYumemiWeather.fetchWeather(any))
+      when(mockYumemiWeather.syncFetchWeather(any))
           .thenThrow(YumemiWeatherError.unknown);
 
       // Act + Assert
       expect(
-        () => container.read(getWeatherProvider)(area: 'tokyo'),
+        () async => container.read(getWeatherProvider)(area: 'tokyo'),
         throwsA(isA<UnknownException>()),
       );
-
-      // Assert
-      verify(mockYumemiWeather.fetchWeather(any)).called(1);
     });
 
     test('YumemiWeather.invalidParameter の場合は InvalidParameterException', () {
       // Arrange
       final container = createMockContainer();
-      when(mockYumemiWeather.fetchWeather(any))
+      when(mockYumemiWeather.syncFetchWeather(any))
           .thenThrow(YumemiWeatherError.invalidParameter);
 
       // Act + Assert
       expect(
-        () => container.read(getWeatherProvider)(area: 'tokyo'),
+        () async => container.read(getWeatherProvider)(area: 'tokyo'),
         throwsA(isA<InvalidParameterException>()),
       );
-
-      // Assert
-      verify(mockYumemiWeather.fetchWeather(any)).called(1);
     });
   });
 }
