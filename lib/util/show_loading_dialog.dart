@@ -18,14 +18,10 @@ Future<T> showLoadingDialog<T>(
 
   try {
     final result = await operation();
-    if (context.mounted) {
-      Navigator.of(context).pop();
-    }
     return result;
-  } on Exception catch (_) {
+  } finally {
     if (context.mounted) {
       Navigator.of(context).pop();
     }
-    rethrow;
   }
 }
