@@ -103,7 +103,7 @@ class __$$RequestDataImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable(createFactory: false)
-class _$RequestDataImpl implements _RequestData {
+class _$RequestDataImpl with DiagnosticableTreeMixin implements _RequestData {
   const _$RequestDataImpl(
       {required this.area, @JsonKey(name: 'date') required this.dateTime});
 
@@ -114,8 +114,17 @@ class _$RequestDataImpl implements _RequestData {
   final DateTime dateTime;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return '_Request(area: $area, dateTime: $dateTime)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', '_Request'))
+      ..add(DiagnosticsProperty('area', area))
+      ..add(DiagnosticsProperty('dateTime', dateTime));
   }
 
   @override

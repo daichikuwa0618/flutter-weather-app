@@ -46,8 +46,8 @@ void main() {
           ProviderScope(
             overrides: [
               getWeatherProvider.overrideWith(
-                (ref) =>
-                    ({required area}) => weather.copyWith(condition: condition),
+                (ref) => ({required area}) async =>
+                    weather.copyWith(condition: condition),
               ),
             ],
             child: MaterialApp(
@@ -90,7 +90,8 @@ void main() {
       );
 
       await tester.tap(find.text('Reload'));
-      await tester.pumpAndSettle();
+      // `CircularProgressIndicator` で `pumpAndSettle` だとタイムアウトになるので `pump` で代替
+      await tester.pump(Durations.long1);
 
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(find.text('Error'), findsOneWidget);

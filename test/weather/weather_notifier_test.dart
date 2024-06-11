@@ -11,7 +11,7 @@ class MockCallback extends Mock {
 }
 
 void main() {
-  test('GetWeather の状態に応じて WeatherState が適切に更新される', () {
+  test('GetWeather の状態に応じて WeatherState が適切に更新される', () async {
     final date = DateTime(2024, 4);
     final result1 = Weather(
       condition: WeatherCondition.cloudy,
@@ -32,10 +32,10 @@ void main() {
       date: date,
     );
     final results = [
-      () => result1,
-      () => result2,
-      () => throw const UnknownException(),
-      () => result3,
+      () async => result1,
+      () async => result2,
+      () async => throw const UnknownException(),
+      () async => result3,
     ];
 
     final callback = MockCallback();
@@ -44,7 +44,7 @@ void main() {
     final container = createContainer(
       overrides: [
         getWeatherProvider.overrideWith(
-          (ref) => ({required area}) => results.removeAt(0).call(),
+          (ref) => ({required area}) async => results.removeAt(0).call(),
         ),
       ],
     );
@@ -58,15 +58,21 @@ void main() {
     );
 
     // Act
-    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
-    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    await container
+        .read(weatherNotifierProvider.notifier)
+        .update(area: 'tokyo');
+    await container
+        .read(weatherNotifierProvider.notifier)
+        .update(area: 'tokyo');
     expect(
       () => container
           .read(weatherNotifierProvider.notifier)
           .update(area: 'tokyo'),
       throwsA(isA<UnknownException>()),
     );
-    container.read(weatherNotifierProvider.notifier).update(area: 'tokyo');
+    await container
+        .read(weatherNotifierProvider.notifier)
+        .update(area: 'tokyo');
 
     // Assert
     verifyInOrder([
